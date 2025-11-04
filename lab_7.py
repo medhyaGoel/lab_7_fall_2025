@@ -1,4 +1,5 @@
 from enum import Enum
+import math
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
@@ -13,11 +14,11 @@ sys.path.append(os.path.dirname(__file__))
 
 IMAGE_WIDTH = 700
 
-# TODO: Define constants for the state machine behavior
-TIMEOUT = pass  # TODO: Set the timeout threshold (in seconds) for determining when a detection is too old
-SEARCH_YAW_VEL = pass  # TODO: Set the angular velocity (rad/s) for rotating while searching for the target
-TRACK_FORWARD_VEL = pass  # TODO: Set the forward velocity (m/s) while tracking the target
-KP = pass  # TODO: Set the proportional gain for the proportional controller that centers the target
+# Tunable constants for the state machine behavior
+TIMEOUT = 1.5  # Timeout threshold (seconds) for determining when a detection is too old
+SEARCH_YAW_VEL = 0.6  # Angular velocity (rad/s) while rotating to search for the target
+TRACK_FORWARD_VEL = 0.2  # Forward velocity (m/s) while tracking the target
+KP = 2.0  # Proportional gain for yaw control when centering the target
 
 class State(Enum):
     IDLE = 0     # Stay in place, no tracking
@@ -55,10 +56,10 @@ class StateMachineNode(Node):
         self.state = State.IDLE
         self.tracking_enabled = False
 
-        # TODO: Initialize member variables to track detection state
-        self.last_detection_pos = pass # TODO: Store the last detection in the image so that we choose the closest detection in this frame
-        self.target_pos = pass  # TODO: Store the target's normalized position in the image (range: -0.5 to 0.5, where 0 is center)
-        self.last_detection_time = pass  # TODO: Store the timestamp of the most recent detection for timeout checking
+        # Detection bookkeeping
+        self.last_detection_pos = None  # Last normalized detection position for association
+        self.target_pos = 0.0  # Current normalized position of the tracked target (-0.5 to 0.5)
+        self.last_detection_time = None  # Timestamp of the most recent detection
         
         self.get_logger().info('State Machine Node initialized in IDLE state.')
         self.get_logger().info('Use begin_tracking(object) to enable tracking.')
@@ -95,7 +96,29 @@ class StateMachineNode(Node):
         - Store the normalized position in self.target_pos
         - Update self.last_detection_time with the current timestamp
         """
-        pass  # TODO: Implement detection callback
+        if not msg.detections:
+            return
+
+        # Determine which detection to track
+        normalized_positions = []
+        for detection in msg.detections:
+            center_x = detection.bbox.center.position.x
+            normalized_x = (center_x / IMAGE_WIDTH) - 0.5
+            normalized_positions.append(normalized_x)
+
+        if not normalized_positions:
+            return
+
+        if self.last_detection_pos is None:
+            # Choose detection closest to image center
+            selected_pos = min(normalized_positions, key=lambda pos: abs(pos))
+        else:
+            # Choose detection closest to previous target position
+            selected_pos = min(normalized_positions, key=lambda pos: abs(pos - self.last_detection_pos))
+
+        self.target_pos = selected_pos
+        self.last_detection_pos = selected_pos
+        self.last_detection_time = self.get_clock().now()
 
     def timer_callback(self):
         """
@@ -114,9 +137,13 @@ class StateMachineNode(Node):
         # - Convert the time difference from nanoseconds to seconds
         # - If time_since_detection > TIMEOUT, transition to State.SEARCH
         # - Otherwise, transition to State.TRACK
-        time_since_detection = pass  # TODO: Calculate time since last detection
-        
-        if False:  # TODO: Replace with condition checking
+        now = self.get_clock().now()
+        if self.last_detection_time is None:
+            time_since_detection = float('inf')
+        else:
+            time_since_detection = (now - self.last_detection_time).nanoseconds / 1e9
+
+        if time_since_detection > TIMEOUT:
             self.state = State.SEARCH
         else:
             self.state = State.TRACK
@@ -131,18 +158,18 @@ class StateMachineNode(Node):
             forward_vel_command = 0.0
         
         elif self.state == State.SEARCH:
-            # TODO: Implement search behavior
-            # - Set yaw_command to rotate in the direction where the target was last seen
-            # - Use SEARCH_YAW_VEL and rotate opposite to the sign of self.target_pos
-            # - Keep forward_vel_command = 0.0 (don't move forward while searching)
-            pass  # TODO: Implement SEARCH state behavior
+            # Rotate in the opposite direction of where the target was last seen
+            direction = -math.copysign(1.0, self.last_detection_pos) if self.last_detection_pos is not None else 1.0
+            yaw_command = direction * SEARCH_YAW_VEL
+            forward_vel_command = 0.0
         
         elif self.state == State.TRACK:
             # TODO: Implement tracking behavior using proportional control
             # - Set yaw_command using a proportional controller: -self.target_pos * KP
             # - This will turn the robot to center the target in the camera view
             # - Set forward_vel_command to TRACK_FORWARD_VEL to move toward the target
-            pass  # TODO: Implement TRACK state behavior
+            yaw_command = -self.target_pos * KP if self.last_detection_pos is not None else 0.0
+            forward_vel_command = TRACK_FORWARD_VEL
 
         cmd = Twist()
         cmd.angular.z = yaw_command
