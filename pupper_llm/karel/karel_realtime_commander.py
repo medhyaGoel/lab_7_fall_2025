@@ -174,7 +174,24 @@ class KarelRealtimeCommanderNode(Node):
             #   - For "dance" actions, the full dance is ~12.0 seconds; use await asyncio.sleep(12.0)
             #   - For most normal moves and turns, use 0.5 seconds.
             # See the KarelPupper API for supported commands and their method names.
-                pass
+            elif command in ["left", "turn_left"]:
+                self.pupper.turn_left()
+                await asyncio.sleep(0.5)
+            elif command in ["right", "turn_right"]:
+                self.pupper.turn_right()
+                await asyncio.sleep(0.5)
+            elif command in ["dance"]:
+                self.pupper.dance()
+                await asyncio.sleep(12.0)
+            elif command in ["wiggle", "wag"]:
+                self.pupper.wiggle()
+                await asyncio.sleep(5.5)
+            elif command in ["bark", "speak"]:
+                self.pupper.bark()
+                await asyncio.sleep(0.5)
+            elif command in ["stop", "halt"]:
+                self.pupper.stop()
+                await asyncio.sleep(0.1)
             
             else:
                 logger.warning(f"⚠️  Unknown command: {command}")
