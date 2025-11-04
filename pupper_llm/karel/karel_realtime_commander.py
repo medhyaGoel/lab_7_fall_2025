@@ -79,7 +79,13 @@ class KarelRealtimeCommanderNode(Node):
         #     ["move", "turn_left", "bark"]
 
         # Your code here:
-        pass
+        lines = response.split('\n')
+        for line in lines:
+            stripped_line = line.strip()
+            if stripped_line:  # Ensure line is not blank
+                commands_from_line = self.extract_commands_from_line(stripped_line)
+                # Use extend to add elements from the returned list, keeping the list flat
+                all_commands.extend(commands_from_line)
 
         
         if all_commands:
@@ -129,7 +135,17 @@ class KarelRealtimeCommanderNode(Node):
             line = "<move, turn_left>"
             returns ['move', 'turn_left']
         """
-        pass
+        VALID_COMMANDS = {"move", "left", "right", "dance", "wiggle", "bark", "stop", "stop_tracking", "stop_following", "track_{object}"}
+        
+        cleaned_line = line.strip().lower()
+        
+        # Because the system_prompt is so strict, we only need to check
+        # if the cleaned line is one of the valid action keywords.
+        if cleaned_line in VALID_COMMANDS:
+            return [cleaned_line]
+        
+        # If the line is "None", blank, or any other text, it's not a valid command.
+        return []
     
     async def execute_command(self, command: str) -> bool:
         """Execute a single robot command."""
