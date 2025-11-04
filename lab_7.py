@@ -19,7 +19,6 @@ TIMEOUT = 1.5  # Timeout threshold (seconds) for determining when a detection is
 SEARCH_YAW_VEL = 0.6  # Angular velocity (rad/s) while rotating to search for the target
 TRACK_FORWARD_VEL = 0.2  # Forward velocity (m/s) while tracking the target
 KP = 2.0  # Proportional gain for yaw control when centering the target
-
 class State(Enum):
     IDLE = 0     # Stay in place, no tracking
     SEARCH = 1   # Rotate to search for target
