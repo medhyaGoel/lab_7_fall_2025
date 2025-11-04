@@ -116,7 +116,7 @@ class StateMachineNode(Node):
         # - Otherwise, transition to State.TRACK
         time_since_detection = # TODO: Calculate time since last detection
         
-        if False:  # TODO: Replace with condition checking
+        if :  # TODO: Replace with condition checking
             self.state = State.SEARCH
         else:
             self.state = State.TRACK
