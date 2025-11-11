@@ -135,7 +135,7 @@ class KarelRealtimeCommanderNode(Node):
             line = "<move, turn_left>"
             returns ['move', 'turn_left']
         """
-        VALID_COMMANDS = {"move", "left", "right", "dance", "wiggle", "bark", "stop", "stop_tracking", "stop_following", "track_{object}"}
+        VALID_COMMANDS = {"move", "left", "right", "dance", "wiggle", "bark", "stop", "stop_tracking_{object}", "track_{object}"}
         
         cleaned_line = line.strip().lower()
         
@@ -163,8 +163,9 @@ class KarelRealtimeCommanderNode(Node):
                 object_name = command.split("_", 1)[1]
                 self.pupper.begin_tracking(object_name)
                 await asyncio.sleep(0.5)
-            elif command in ["stop_tracking", "stop_following"]:
-                self.pupper.end_tracking()
+            elif command.startswith("stop_tracking_"):
+                object_name = command.split("_", 1)[1]
+                self.pupper.end_tracking(object_name)
                 await asyncio.sleep(0.5)
             
             # TODO: Paste your Lab 6 command mapping implementation below
@@ -199,7 +200,6 @@ class KarelRealtimeCommanderNode(Node):
             elif command in ["stop", "halt"]:
                 self.pupper.stop()
                 await asyncio.sleep(0.1)
-            
             else:
                 logger.warning(f"⚠️  Unknown command: {command}")
                 return False

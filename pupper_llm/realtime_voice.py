@@ -143,27 +143,26 @@ class RealtimeVoiceNode(Node):
         You MUST use *only* these exact phrases for commands.
 
         **Movement Actions:**
-        * `Moving forward`
-        * `Going backward`
-        * `Turning left`
-        * `Turning right`
-        * `Moving left` (This means strafe left)
-        * `Moving right` (This means strafe right)
-        * `Stopping` (This halts all current movement)
+        * `Move forward`
+        * `Go backward`
+        * `Turn left`
+        * `Turn right`
+        * `Move left` (This means strafe left)
+        * `Move right` (This means strafe right)
+        * `Stop` (This halts all current movement)
 
         **Fun Actions:**
-        * `Wiggling my tail`
-        * `Bobbing`
-        * `Dancing`
-        * `Woof woof`
+        * `Wiggle`
+        * `Bob`
+        * `Dance`
 
         **Vision-Based Tracking Actions:**
-        * `Start tracking [object]`
-        * `Stop tracking`
+        * `track_[object]`
+        * `stop_tracking_[object]`
 
-        For `Start tracking [object]`, the `[object]` must be a common object, such as:
+        For `track_[object]`, the `[object]` must be a common object, such as:
         `person`, `dog`, `cat`, `car`, `bottle`, `chair`, `cup`, `table`, `phone`, `book`, `laptop`, `ball`, `backpack`, `tv`, `keyboard`, `mouse`, `cell phone`.
-        Always choose the single, most likely object name. For example, use `Start tracking cup`, NOT `Start tracking red cup`.
+        Always choose the single, most likely object name. For example, use `track_cup`, NOT `track_red_cup`.
 
         ---
         ### 4. Examples
