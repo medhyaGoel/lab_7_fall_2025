@@ -81,7 +81,7 @@ class KarelRealtimeCommanderNode(Node):
         # Your code here:
         lines = response.split('\n')
         for line in lines:
-            stripped_line = line.strip()
+            stripped_line = line
             if stripped_line:  # Ensure line is not blank
                 commands_from_line = self.extract_commands_from_line(stripped_line)
                 # Use extend to add elements from the returned list, keeping the list flat
@@ -145,17 +145,17 @@ class KarelRealtimeCommanderNode(Node):
             "stop", "halt",
             # Common/short actions people might say
             "bob", "roll", "shake", "sit", "stand",
-            # Tracking command templates
-            "stop_tracking_{object}", "track_{object}"
         }
         
         cleaned_line = line.strip().lower()
         
         # Because the system_prompt is so strict, we only need to check
         # if the cleaned line is one of the valid action keywords.
+        if cleaned_line.startswith("track_") or cleaned_line.startswith("stop_tracking_"):
+            return [cleaned_line]
         if cleaned_line in VALID_COMMANDS:
             return [cleaned_line]
-        
+
         # If the line is "None", blank, or any other text, it's not a valid command.
         return []
     

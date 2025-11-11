@@ -159,7 +159,86 @@ Action Command Lexicon (exact, lowercase tokens)
     - stop_tracking_{object}
 
 Allowed object names for tracking: choose a single, most-likely word (use lowercase, no spaces). Examples include:
-person, dog, cat, car, bottle, chair, cup, table, phone, book, laptop, ball, backpack, tv, keyboard, mouse, bird, couch
+person
+bicycle
+car
+motorcycle
+airplane
+bus
+train
+truck
+boat
+traffic light
+fire hydrant
+stop sign
+parking meter
+bench
+bird
+cat
+dog
+horse
+sheep
+cow
+elephant
+bear
+zebra
+giraffe
+backpack
+umbrella
+handbag
+tie
+suitcase
+frisbee
+skis
+snowboard
+sports ball
+kite
+baseball bat
+baseball glove
+skateboard
+surfboard
+tennis racket
+bottle
+wine glass
+cup
+fork
+knife
+spoon
+bowl
+banana
+apple
+sandwich
+orange
+broccoli
+carrot
+hot dog
+pizza
+donut
+cake
+chair
+couch
+potted plant
+bed
+dining table
+toilet
+tv
+laptop
+mouse
+remote
+keyboard
+cell phone
+microwave
+oven
+toaster
+sink
+refrigerator
+book
+clock
+vase
+scissors
+teddy bear
+hair drier
+toothbrush
 
 Rules for tracking tokens:
 - Use `track_person`, `track_dog`, etc. Do NOT include adjectives (e.g., use `track_cup`, not `track_red_cup`).
