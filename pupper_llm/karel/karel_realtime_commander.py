@@ -135,7 +135,19 @@ class KarelRealtimeCommanderNode(Node):
             line = "<move, turn_left>"
             returns ['move', 'turn_left']
         """
-        VALID_COMMANDS = {"move", "left", "right", "dance", "wiggle", "bark", "stop", "stop_tracking_{object}", "track_{object}"}
+        VALID_COMMANDS = {
+            "move", "go", "forward",
+            "left", "turn_left",
+            "right", "turn_right",
+            "dance",
+            "wiggle", "wag",
+            "bark", "speak",
+            "stop", "halt",
+            # Common/short actions people might say
+            "bob", "roll", "shake", "sit", "stand",
+            # Tracking command templates
+            "stop_tracking_{object}", "track_{object}"
+        }
         
         cleaned_line = line.strip().lower()
         
